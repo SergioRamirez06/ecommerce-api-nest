@@ -6,19 +6,22 @@ import { type Response  } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { fileFilter, fileNamer } from './helpers';
 
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
-
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
-
 
   constructor(
     private readonly filesService: FilesService,
     private readonly configService: ConfigService,
   ) {}
 
-
   @Get('product/:imageName')
+  @ApiOperation({ summary: 'Obtener imagen de producto' })
+  @ApiResponse({ status: 200, description: 'Imagen encontrada' })
+  @ApiResponse({ status: 404, description: 'Imagen no encontrada' })
+  @ApiParam({ name: 'imageName', description: 'Nombre de la imagen', example: 'image.jpg' })
   findProductImage(
     @Res() res: Response,
     @Param('imageName') imageName: string,
@@ -29,8 +32,23 @@ export class FilesController {
     return path;
   }
 
-
   @Post('product')
+  @ApiOperation({ summary: 'Subir imagen de producto' })
+  @ApiResponse({ status: 201, description: 'Imagen subida correctamente' })
+  @ApiResponse({ status: 400, description: 'Archivo inválido' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Archivo de imagen',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors( FileInterceptor('file', {
     fileFilter: fileFilter,
     // limits: { fileSize: 1000  },
@@ -54,6 +72,3 @@ export class FilesController {
     }
   }
 }
-
-
-
