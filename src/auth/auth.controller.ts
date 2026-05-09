@@ -1,12 +1,11 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 
-import { GetUser } from './decorators';
+import { Auth, GetUser } from './decorators';
 
 import { CreateUserDto, LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { User } from './entities/user.entity';
 
-// 👇 Swagger imports
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Auth')
@@ -31,6 +30,7 @@ export class AuthController {
   }
 
   @Get('check-status')
+  @Auth()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Verificar estado de autenticación' })
   @ApiResponse({ status: 200, description: 'Usuario autenticado' })
@@ -38,8 +38,8 @@ export class AuthController {
   checkAuthStatus(
     @GetUser() user: User,
   ) {
-
     return this.authService.checkAuthStatus( user )
+
   }
 
 }

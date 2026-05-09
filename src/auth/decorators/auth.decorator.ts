@@ -10,6 +10,5 @@ export function Auth(...roles: ValidRoles[]) {
     return applyDecorators(
       RoleProcted( ...roles ),
       UseGuards( AuthGuard(), UserRoleGuard )
-
     );
 }
